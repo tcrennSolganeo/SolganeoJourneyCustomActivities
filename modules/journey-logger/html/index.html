@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Journey Logger Activity</title>
+    <link rel="stylesheet" type="text/css" href="dist/design-system/styles/salesforce-lightning-design-system.css" >
+    <link rel="stylesheet" type="text/css" href="styles/styles.css" >
+</head>
+<body>
+<div class="slds-form slds-m-around--medium" style="height: 100%;position: relative;margin-top: 0;">
+    <div id="header">
+        <div id="headerIconContainer">
+            <img id="headerIcon" src="images/icon.svg" width="20" height="20" />
+        </div>
+        <h2 style="padding-top: 2px;">Journey Logger Summary</h2>
+    </div>
+    <div class="slds-form-element slds-m-bottom_small">
+        <label class="slds-form-element__label" for="path-label">Label</label>
+        <div class="slds-form-element__control">
+            <div class="slds-input_container">
+                <input type="text" class="slds-input" id="path-label" placeholder="Branch 123">
+            </div>
+        </div>
+    </div>
+
+    <div style="position: absolute;width: 100%;bottom: 68px;">
+        <button class="accordion">How it works ?</button>
+        <div class="panel">
+            <br>
+            <p>This activity insert a record in a Data Extension each time a contact go throught it.</p>
+            <p>The Data Extension should be setup as follows:</p>
+            <br>
+            <table style="width: auto;margin-bottom: 5px;">
+                <tr>
+                    <th>Data Extension Name</th>
+                    <td>Journey Logger</td>
+                </tr>
+                <tr>
+                    <th>Data Extension External Key</th>
+                    <td>Journey_Logger</td>
+                </tr>
+            </table>
+            <table style="width: auto;" id="deDescriptionTable">
+                <thead>
+                    <tr>
+                        <th>Field Name</th>
+                        <th>Field Type</th>
+                        <th>Field Size</th>
+                        <th>Primary Key</th>
+                        <th>Nullable</th>
+                        <th>Default value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ContactKey</td>
+                        <td>Text</td>
+                        <td>255</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Label</td>
+                        <td>Text</td>
+                        <td>150</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>EventDate</td>
+                        <td>Date</td>
+                        <td></td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td>Current Date</td>
+                    </tr>
+                    <tr>
+                        <td>Journey Definition Id</td>
+                        <td>Text</td>
+                        <td>36</td>
+                        <td>No</td>
+                        <td>Yes</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Journey Version</td>
+                        <td>Number</td>
+                        <td></td>
+                        <td>No</td>
+                        <td>Yes</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Journey Name</td>
+                        <td>Text</td>
+                        <td>200</td>
+                        <td>No</td>
+                        <td>Yes</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <br>
+        </div>
+    </div>
+</div>
+<div id="discount-code-output" class="slds-text-heading_small"></div>
+<div class="slds-docked-form-footer" style="justify-content: flex-end">
+    <button id="cancel" type="button" class="slds-button slds-button_neutral">Cancel</button>
+    <button id="done" disabled type="button" class="slds-button slds-button_brand slds-m-right--medium">Done</button>
+</div>
+<script type="text/javascript" src="dist/journey-logger-activity.js"></script>
+</body>
+</html>
