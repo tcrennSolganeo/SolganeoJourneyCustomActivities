@@ -13,7 +13,7 @@
 
 const express = require('express');
 const axios = require('axios');
-const jwtDecode = require('jwt-decode');
+/*const jwtDecode = require('jwt-decode');*/
 const configJSON = require('../config/config-json');
 
 // setup the journey-logger app
@@ -167,7 +167,7 @@ module.exports = function journeyLogger(app, options) {
         try {
 
             if(isSfmcApiTokenExpired(this.sfmcApiToken)) {
-                getSfmcApiToken();
+                this.getSfmcApiToken();
             }
             /*if(!sfmcApiToken) {
                 getSfmcApiToken();
@@ -212,14 +212,15 @@ module.exports = function journeyLogger(app, options) {
 
     function isSfmcApiTokenExpired(token) {
         if (!token) return true;
-        try {
+        return true;
+        /*try {
             const decodedToken = jwtDecode(token);
             const currentTime = Date.now() / 1000;
             return decodedToken.exp < currentTime;
         } catch (error) {
             console.error('Error decoding token:', error);
             return true;
-        }
+        }*/
     }
 
     async function getSfmcApiToken() {
