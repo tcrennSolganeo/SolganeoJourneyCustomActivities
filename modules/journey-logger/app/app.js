@@ -12,12 +12,18 @@
 //    - stop
 
 const express = require('express');
-const axios = require('axios')
+const axios = require('axios');
+const jwtDecode = require('jwt-decode');
 const configJSON = require('../config/config-json');
 
 // setup the journey-logger app
 module.exports = function journeyLogger(app, options) {
     const moduleDirectory = `${options.rootDirectory}/modules/journey-logger`;
+    const sfmcApiClientId = process.env.clientId;
+    const sfmcApiClientSecret = process.env.clientSecret;
+    const sfmcApiDataExtensionKey = 'Journey_Logger';
+    const sfmcApiSubdomain = process.env.subdomain;
+    let sfmcApiToken = null;
 
     // setup static resources
     app.use('/modules/journey-logger/dist', express.static(`${moduleDirectory}/dist`));
@@ -155,22 +161,17 @@ module.exports = function journeyLogger(app, options) {
         console.log('journeyNameInArgument', journeyNameInArgument);
         console.log('labelInArgument', labelInArgument);
 
-        const clientId = process.env.clientId;
-        const clientSecret = process.env.clientSecret;
-        const dataExtensionKey = 'Journey_Logger';
-        const subdomain = process.env.subdomain;
-        const authEndpoint = 'https://'+subdomain+'.auth.marketingcloudapis.com/v2/token';
-        const dataExtensionEndpoint = 'https://'+subdomain+'.rest.marketingcloudapis.com/data/v1/async/dataextensions/key:'+dataExtensionKey+'/rows';
+        const authEndpoint = 'https://'+sfmcApiSubdomain+'.auth.marketingcloudapis.com/v2/token';
+        const dataExtensionEndpoint = 'https://'+sfmcApiSubdomain+'.rest.marketingcloudapis.com/data/v1/async/dataextensions/key:'+sfmcApiDataExtensionKey+'/rows';
         
         try {
 
-            const authResponse = await axios.post(authEndpoint, {
-                grant_type: 'client_credentials',
-                client_id: clientId,
-                client_secret: clientSecret
-            });
-
-            const accessToken = authResponse.data.access_token;
+            if(isSfmcApiTokenExpired(this.sfmcApiToken)) {
+                getSfmcApiToken();
+            }
+            /*if(!sfmcApiToken) {
+                getSfmcApiToken();
+            }*/
 
             const data = {
                 'items': [
@@ -186,7 +187,7 @@ module.exports = function journeyLogger(app, options) {
 
             const dataExtensionResponse = await axios.post(dataExtensionEndpoint, data, {
                 headers: {
-                    'Authorization': `Bearer ${accessToken}`,
+                    'Authorization': `Bearer ${this.sfmcApiToken}`,
                     'Content-Type': 'application/json',
                 },
             });
@@ -207,5 +208,29 @@ module.exports = function journeyLogger(app, options) {
         }
 
     });
+
+
+    function isSfmcApiTokenExpired(token) {
+        if (!token) return true;
+        try {
+            const decodedToken = jwtDecode(token);
+            const currentTime = Date.now() / 1000;
+            return decodedToken.exp < currentTime;
+        } catch (error) {
+            console.error('Error decoding token:', error);
+            return true;
+        }
+    }
+
+    async function getSfmcApiToken() {
+        const authEndpoint = 'https://'+sfmcApiSubdomain+'.auth.marketingcloudapis.com/v2/token';
+        const authResponse = await axios.post(authEndpoint, {
+            grant_type: 'client_credentials',
+            client_id: sfmcApiClientId,
+            client_secret: sfmcApiClientSecret
+        });
+        this.sfmcApiToken = authResponse.data.access_token;
+        return this.accessToken;
+    }
 
 };

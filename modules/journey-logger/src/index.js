@@ -108,6 +108,9 @@ function onInitActivity(payload) {
     // if the discountCode back argument doesn't exist the user can pick
     // a discountCode message from the drop down list. the discountCode back arg
     // will be set once the journey executes the activity
+
+    checkDataExtensionStatus();
+
 }
 
 function requestedInteraction(payload) {
@@ -119,14 +122,19 @@ function requestedInteraction(payload) {
     interaction = payload;
 }
 
-function onCheckDEClick() {
-    console.log("CheckDE Click");
+function checkDataExtensionStatus() {
+    console.log("Check Data Extension Status");
     $.ajax({
-        type: 'GET', // change this
+        type: 'GET',
         url: '/modules/journey-logger/checkDataExtensionSetup'
     }).done(function(data) {
         console.log("CheckDE result", data);
     });
+}
+
+function onCheckDEClick() {
+    console.log("CheckDE Click");
+    checkDataExtensionStatus();
 }
 
 function onDoneButtonClick() {
