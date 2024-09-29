@@ -119,6 +119,16 @@ function requestedInteraction(payload) {
     interaction = payload;
 }
 
+function onCheckDEClick() {
+    console.log("CheckDE Click");
+    $.ajax({
+        type: 'GET', // change this
+        url: '/modules/journey-logger/checkDataExtensionSetup'
+    }).done(function(data) {
+        console.log("CheckDE result", data);
+    });
+}
+
 function onDoneButtonClick() {
     // we set must metaData.isConfigured in order to tell JB that
     // this activity is ready for activation
@@ -184,6 +194,7 @@ function setupEventHandlers() {
     // Listen to events on the form
     document.getElementById('done').addEventListener('click', onDoneButtonClick);
     document.getElementById('cancel').addEventListener('click', onCancelButtonClick);
+    document.getElementById('checkDE').addEventListener('click', onCheckDEClick);
     document.getElementById('path-label').addEventListener('input', onLabelInputChange);
 }
 

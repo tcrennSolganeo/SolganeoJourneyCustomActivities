@@ -43,6 +43,11 @@ module.exports = function journeyLogger(app, options) {
         return res.status(200).json(configJSON(req));
     });
 
+    app.get('/modules/journey-logger/checkDataExtensionSetup', function(req, res) {
+        console.log('checkDataExtensionSetup');
+        return {status: 'OK'};
+    });
+
     // ```````````````````````````````````````````````````````
     // BEGIN JOURNEY BUILDER LIFECYCLE EVENTS
     //
