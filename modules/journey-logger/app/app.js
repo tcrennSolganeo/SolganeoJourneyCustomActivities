@@ -230,7 +230,7 @@ module.exports = function journeyLogger(app, options) {
             client_secret: sfmcApiClientSecret
         });
         sfmcApiToken = authResponse.data.access_token;
-        return accessToken;
+        return sfmcApiToken;
     }
 
 };
