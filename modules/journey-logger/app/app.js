@@ -169,6 +169,9 @@ module.exports = function journeyLogger(app, options) {
             if(isSfmcApiTokenExpired(sfmcApiToken)) {
                 getSfmcApiToken();
             }
+
+            const decodedToken = jwtDecode(token);
+            console.log("decodedToken", JSON.stringify(decodedToken));
             /*if(!sfmcApiToken) {
                 getSfmcApiToken();
             }*/
