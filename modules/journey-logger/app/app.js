@@ -166,7 +166,7 @@ module.exports = function journeyLogger(app, options) {
         
         try {
 
-            if(isSfmcApiTokenExpired(this.sfmcApiToken)) {
+            if(isSfmcApiTokenExpired(sfmcApiToken)) {
                 getSfmcApiToken();
             }
             /*if(!sfmcApiToken) {
@@ -187,7 +187,7 @@ module.exports = function journeyLogger(app, options) {
 
             const dataExtensionResponse = await axios.post(dataExtensionEndpoint, data, {
                 headers: {
-                    'Authorization': `Bearer ${this.sfmcApiToken}`,
+                    'Authorization': `Bearer ${sfmcApiToken}`,
                     'Content-Type': 'application/json',
                 },
             });
@@ -229,8 +229,8 @@ module.exports = function journeyLogger(app, options) {
             client_id: sfmcApiClientId,
             client_secret: sfmcApiClientSecret
         });
-        this.sfmcApiToken = authResponse.data.access_token;
-        return this.accessToken;
+        sfmcApiToken = authResponse.data.access_token;
+        return accessToken;
     }
 
 };
