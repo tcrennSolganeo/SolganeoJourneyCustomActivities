@@ -45,7 +45,7 @@ module.exports = function journeyLogger(app, options) {
 
     app.get('/modules/journey-logger/checkDataExtensionSetup', function(req, res) {
         console.log('checkDataExtensionSetup');
-        return {status: 'OK'};
+        res.status(200).json({status: 'OK'});
     });
 
     // ```````````````````````````````````````````````````````
