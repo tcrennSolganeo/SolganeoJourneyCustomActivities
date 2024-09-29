@@ -170,8 +170,8 @@ module.exports = function journeyLogger(app, options) {
                 getSfmcApiToken();
             }
 
-            const decodedToken = jwt_decode(sfmcApiToken);
-            console.log("decodedToken", JSON.stringify(decodedToken));
+            /*const decodedToken = jwt_decode(sfmcApiToken);
+            console.log("decodedToken", JSON.stringify(decodedToken));*/
             /*if(!sfmcApiToken) {
                 getSfmcApiToken();
             }*/
