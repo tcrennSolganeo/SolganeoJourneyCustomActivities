@@ -13,8 +13,7 @@
 
 const express = require('express');
 const axios = require('axios');
-import { jwtDecode } from 'jwt-decode';
-/*const jwtDecode = require('jwt-decode');*/
+const { default: jwtDecode } = require('jwt-decode');
 const configJSON = require('../config/config-json');
 
 // setup the journey-logger app
