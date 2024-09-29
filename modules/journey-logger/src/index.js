@@ -109,7 +109,7 @@ function onInitActivity(payload) {
     // a discountCode message from the drop down list. the discountCode back arg
     // will be set once the journey executes the activity
 
-    checkDataExtensionStatus();
+    //checkDataExtensionStatus();
 
 }
 
