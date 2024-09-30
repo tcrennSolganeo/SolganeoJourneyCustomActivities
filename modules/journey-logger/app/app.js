@@ -13,6 +13,7 @@
 
 const express = require('express');
 const axios = require('axios');
+const FuelSoap = require('fuel-soap');
 const configJSON = require('../config/config-json');
 
 // setup the journey-logger app
@@ -165,7 +166,15 @@ module.exports = function journeyLogger(app, options) {
         
         try {
 
-            const responseObject = await insertLogIntoDEREST({
+            /*const responseObject = await insertLogIntoDEREST({
+                contactkey: contactkeyInArgument,
+                label: labelInArgument,
+                journeyDefinitionId: journeyDefinitionIdInArgument,
+                journeyVersion: journeyVersionInArgument,
+                journeyName: journeyNameInArgument
+            });*/
+
+            const responseObject = await insertLogIntoDESOAP({
                 contactkey: contactkeyInArgument,
                 label: labelInArgument,
                 journeyDefinitionId: journeyDefinitionIdInArgument,
@@ -183,6 +192,61 @@ module.exports = function journeyLogger(app, options) {
         }
 
     });
+
+
+    function insertLogIntoDESOAP(logData) {
+        const authEndpoint = 'https://'+sfmcApiSubdomain+'.auth.marketingcloudapis.com/v2/token';
+        const authBaseURI = 'https://'+sfmcApiSubdomain+'.auth.marketingcloudapis.com/';
+        const options = {
+            auth: {
+                clientId: sfmcApiClientId,
+                clientSecret: sfmcApiClientSecret,
+                authVersion: 2,
+                authUrl:  authEndpoint,
+                authOptions:{
+                    authVersion: 2
+                }
+            }
+            , soapEndpoint: authBaseURI
+        };
+
+        const client = new FuelSoap(options);
+
+        const co = {
+            "CustomerKey": sfmcApiDataExtensionKey,
+            "Keys":[
+                {"Key":{"Name":"ContactKey","Value":logData.contactkey}},
+                {"Key":{"Name":"Label","Value":logData.label}}
+            ],
+            "Properties":[
+                {"Property":
+                        [
+                            {"Name":"Journey Definition Id","Value":logData.journeyDefinitionId},
+                            {"Name":"Journey Version","Value":logData.journeyVersion},
+                            {"Name":"Journey Name","Value":logData.journeyName}
+                        ]
+                }
+            ]
+        };
+    
+        const uo = {
+            SaveOptions: [{ "SaveOption": { PropertyName: "DataExtensionObject", SaveAction: "UpdateAdd" } }]
+        };
+    
+        client.update('DataExtensionObject',co,uo, function(err, response){
+            
+            if(err) console.log(err)
+    
+            console.log('FuelSoap resp:', response.body)
+    
+            return {
+                label: logData.label,
+                data: response.body
+            };
+
+        });
+    }
+
 
     async function insertLogIntoDEREST(logData) {
 
@@ -238,7 +302,7 @@ module.exports = function journeyLogger(app, options) {
             client_secret: sfmcApiClientSecret
         });
         GLOBAL_sfmcApiToken = authResponse.data.access_token;
-        GLOBAL_sfmcApiTokenExpDate = (Date.now() / 1000) + 180;
+        GLOBAL_sfmcApiTokenExpDate = (Date.now() / 1000) + 300;
         /*sfmcApiTokenExpDate = (Date.now() / 1000) + authResponse.data.expires_in;*/
         /*console.log('New token:', sfmcApiToken);*/
         return GLOBAL_sfmcApiToken;
