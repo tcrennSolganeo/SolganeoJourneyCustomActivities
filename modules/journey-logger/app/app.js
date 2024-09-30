@@ -148,14 +148,14 @@ module.exports = function journeyLogger(app, options) {
             }
         }
 
-        const contactkeyInArgument = getInArgument('contactKey');
+        const contactKeyInArgument = getInArgument('contactKey');
         const journeyDefinitionIdInArgument = getInArgument('journeyDefinitionId');
         const journeyVersionInArgument = getInArgument('journeyVersion');
         const journeyIdInArgument = getInArgument('journeyId');
         const journeyNameInArgument = getInArgument('journeyName');
         const labelInArgument = getInArgument('label');
 
-        /*console.log('contactkeyInArgument', contactkeyInArgument);
+        /*console.log('contactKeyInArgument', contactKeyInArgument);
         console.log('journeyDefinitionIdInArgument', journeyDefinitionIdInArgument);
         console.log('journeyVersionInArgument', journeyVersionInArgument);
         console.log('journeyIdInArgument', journeyIdInArgument);
@@ -167,7 +167,7 @@ module.exports = function journeyLogger(app, options) {
         try {
 
             /*const responseObject = await insertLogIntoDEREST({
-                contactkey: contactkeyInArgument,
+                contactKey: contactKeyInArgument,
                 label: labelInArgument,
                 journeyDefinitionId: journeyDefinitionIdInArgument,
                 journeyVersion: journeyVersionInArgument,
@@ -175,8 +175,9 @@ module.exports = function journeyLogger(app, options) {
             });*/
 
             const responseObject = await insertLogIntoDESOAP({
-                contactkey: contactkeyInArgument,
+                contactKey: contactKeyInArgument,
                 label: labelInArgument,
+                eventDate: (new Date()).toISOString(),
                 journeyDefinitionId: journeyDefinitionIdInArgument,
                 journeyVersion: journeyVersionInArgument,
                 journeyName: journeyNameInArgument
@@ -195,6 +196,7 @@ module.exports = function journeyLogger(app, options) {
 
 
     function insertLogIntoDESOAP(logData) {
+        console.log("LogData: ", logData);
         const authEndpoint = 'https://'+sfmcApiSubdomain+'.auth.marketingcloudapis.com/v2/token';
         const authBaseURI = 'https://'+sfmcApiSubdomain+'.auth.marketingcloudapis.com/';
         const options = {
@@ -215,7 +217,7 @@ module.exports = function journeyLogger(app, options) {
         const co = {
             "CustomerKey": sfmcApiDataExtensionKey,
             "Keys":[
-                {"Key":{"Name":"ContactKey","Value":logData.contactkey}},
+                {"Key":{"Name":"ContactKey","Value":logData.contactKey}},
                 {"Key":{"Name":"Label","Value":logData.label}},
                 {"Key":{"EventDate":"Label","Value":(new Date()).toISOString()}}
             ],
@@ -262,7 +264,7 @@ module.exports = function journeyLogger(app, options) {
         const data = {
             'items': [
                 {
-                    'ContactKey': logData.contactkey,
+                    'ContactKey': logData.contactKey,
                     'Label': logData.label,
                     'Journey Definition Id': logData.journeyDefinitionId,
                     'Journey Version': logData.journeyVersion,
