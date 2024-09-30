@@ -198,7 +198,7 @@ module.exports = function journeyLogger(app, options) {
     function insertLogIntoDESOAP(logData) {
         console.log("LogData: ", logData);
         const authEndpoint = 'https://'+sfmcApiSubdomain+'.auth.marketingcloudapis.com/v2/token';
-        const authBaseURI = 'https://'+sfmcApiSubdomain+'.auth.marketingcloudapis.com/';
+        const soapBaseURI = 'https://'+sfmcApiSubdomain+'.soap.marketingcloudapis.com/Service.asmx';
         const options = {
             auth: {
                 clientId: sfmcApiClientId,
@@ -209,7 +209,7 @@ module.exports = function journeyLogger(app, options) {
                     authVersion: 2
                 }
             }
-            , soapEndpoint: authBaseURI
+            , soapEndpoint: soapBaseURI
         };
 
         const client = new FuelSoap(options);
@@ -240,10 +240,7 @@ module.exports = function journeyLogger(app, options) {
             
             if(err) { 
                 console.log('FuelSoap error: ',err);
-                return {
-                    label: logData.label,
-                    data: err
-                };
+                throw new Error(err);
             } else if(response && response.body) {
                 console.log('FuelSoap resp: ', response.body)
                 return {
