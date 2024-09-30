@@ -218,7 +218,7 @@ module.exports = function journeyLogger(app, options) {
 
         const co = {
             "CustomerKey": sfmcApiDataExtensionKey,
-            "Keys":[
+            /*"Keys":[
                 {"Key":
                         [
                             {"Name":"ContactKey","Value":logData.contactKey},
@@ -226,15 +226,13 @@ module.exports = function journeyLogger(app, options) {
                             {"Name":"EventDate","Value":logData.eventDate}
                         ]
                 }
-            ],
-            /*"Keys":[
-                {"Key":{"Name":"ContactKey","Value":logData.contactKey}},
-                {"Key":{"Name":"Label","Value":logData.label}},
-                {"Key":{"Name":"EventDate","Value":logData.eventDate}}
             ],*/
             "Properties":[
                 {"Property":
                         [
+                            {"Name":"ContactKey","Value":logData.contactKey},
+                            {"Name":"Label","Value":logData.label},
+                            {"Name":"EventDate","Value":logData.eventDate},
                             {"Name":"Journey Definition Id","Value":logData.journeyDefinitionId},
                             {"Name":"Journey Version","Value":logData.journeyVersion},
                             {"Name":"Journey Name","Value":logData.journeyName}
@@ -248,7 +246,7 @@ module.exports = function journeyLogger(app, options) {
         };
     
         SoapClient.update('DataExtensionObject',co,uo, function(err, response){
-            
+                
             if(err) { 
                 console.log('FuelSoap error: ',err);
                 throw new Error(err);
