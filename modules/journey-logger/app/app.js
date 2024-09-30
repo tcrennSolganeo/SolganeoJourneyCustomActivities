@@ -216,7 +216,8 @@ module.exports = function journeyLogger(app, options) {
             "CustomerKey": sfmcApiDataExtensionKey,
             "Keys":[
                 {"Key":{"Name":"ContactKey","Value":logData.contactkey}},
-                {"Key":{"Name":"Label","Value":logData.label}}
+                {"Key":{"Name":"Label","Value":logData.label}},
+                {"Key":{"EventDate":"Label","Value":(new Date()).toISOString()}}
             ],
             "Properties":[
                 {"Property":
