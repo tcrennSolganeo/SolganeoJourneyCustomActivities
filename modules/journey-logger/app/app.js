@@ -24,6 +24,7 @@ module.exports = function journeyLogger(app, options) {
     const sfmcApiDataExtensionKey = 'Journey_Logger';
     const sfmcApiSubdomain = process.env.subdomain;
     let sfmcApiToken = null;
+    let sfmcApiTokenExpDate = null;
 
     // setup static resources
     app.use('/modules/journey-logger/dist', express.static(`${moduleDirectory}/dist`));
@@ -165,7 +166,7 @@ module.exports = function journeyLogger(app, options) {
         
         try {
 
-            if(isSfmcApiTokenExpired(sfmcApiToken)) {
+            if(isSfmcApiTokenExpired()) {
                 await getSfmcApiToken();
             } else {
                 console.log('Use existing token');
@@ -214,17 +215,12 @@ module.exports = function journeyLogger(app, options) {
     });
 
 
-    function isSfmcApiTokenExpired(token) {
-        if (!token) return true;
-        return false;
-        /*try {
-            const decodedToken = jwt_decode(token);
-            const currentTime = Date.now() / 1000;
-            return decodedToken.exp < currentTime;
-        } catch (error) {
-            console.error('Error decoding token:', error);
+    function isSfmcApiTokenExpired() {
+        if(!sfmcApiToken || sfmcApiToken == null || sfmcApiToken == '') {
             return true;
-        }*/
+        }
+        const currentTime = Date.now() / 1000;
+        return sfmcApiTokenExpDate < currentTime;
     }
 
     async function getSfmcApiToken() {
@@ -236,6 +232,8 @@ module.exports = function journeyLogger(app, options) {
             client_secret: sfmcApiClientSecret
         });
         sfmcApiToken = authResponse.data.access_token;
+        sfmcApiTokenExpDate = (Date.now() / 1000) + 180;
+        /*sfmcApiTokenExpDate = (Date.now() / 1000) + authResponse.data.expires_in;*/
         /*console.log('New token:', sfmcApiToken);*/
         return sfmcApiToken;
     }
