@@ -219,7 +219,7 @@ module.exports = function journeyLogger(app, options) {
             "Keys":[
                 {"Key":{"Name":"ContactKey","Value":logData.contactKey}},
                 {"Key":{"Name":"Label","Value":logData.label}},
-                {"Key":{"EventDate":"Label","Value":(new Date()).toISOString()}}
+                {"Key":{"Name":"EventDate","Value":logData.eventDate}}
             ],
             "Properties":[
                 {"Property":
@@ -238,14 +238,21 @@ module.exports = function journeyLogger(app, options) {
     
         client.update('DataExtensionObject',co,uo, function(err, response){
             
-            if(err) console.log(err)
-    
-            console.log('FuelSoap resp:', response.body)
-    
-            return {
-                label: logData.label,
-                data: response.body
-            };
+            if(err) { 
+                console.log('FuelSoap error: ',err);
+                return {
+                    label: logData.label,
+                    data: err
+                };
+            } else if(response && response.body) {
+                console.log('FuelSoap resp: ', response.body)
+                return {
+                    label: logData.label,
+                    data: response.body
+                };
+            }
+
+            return null;
 
         });
     }
