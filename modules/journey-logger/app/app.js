@@ -197,9 +197,9 @@ module.exports = function journeyLogger(app, options) {
 
     function insertLogIntoDESOAP(logData) {
         console.log("LogData: ", logData);
-        const authEndpoint = 'https://'+sfmcApiSubdomain+'.auth.marketingcloudapis.com/v2/token';
-        const soapBaseURI = 'https://'+sfmcApiSubdomain+'.soap.marketingcloudapis.com/Service.asmx';
-        const options = {
+        var authEndpoint = 'https://'+sfmcApiSubdomain+'.auth.marketingcloudapis.com/v2/token';
+        var soapBaseURI = 'https://'+sfmcApiSubdomain+'.soap.marketingcloudapis.com/Service.asmx';
+        var options = {
             auth: {
                 clientId: sfmcApiClientId,
                 clientSecret: sfmcApiClientSecret,
@@ -208,19 +208,30 @@ module.exports = function journeyLogger(app, options) {
                 authOptions:{
                     authVersion: 2
                 }
-            }
-            , soapEndpoint: soapBaseURI
+            }, 
+            soapEndpoint: soapBaseURI
         };
 
-        const client = new FuelSoap(options);
+        console.log("SoapClient options: ", options);
+
+        var SoapClient = new FuelSoap(options);
 
         const co = {
             "CustomerKey": sfmcApiDataExtensionKey,
             "Keys":[
+                {"Key":
+                        [
+                            {"Name":"ContactKey","Value":logData.contactKey},
+                            {"Name":"Label","Value":logData.label},
+                            {"Name":"EventDate","Value":logData.eventDate}
+                        ]
+                }
+            ],
+            /*"Keys":[
                 {"Key":{"Name":"ContactKey","Value":logData.contactKey}},
                 {"Key":{"Name":"Label","Value":logData.label}},
                 {"Key":{"Name":"EventDate","Value":logData.eventDate}}
-            ],
+            ],*/
             "Properties":[
                 {"Property":
                         [
@@ -236,7 +247,7 @@ module.exports = function journeyLogger(app, options) {
             SaveOptions: [{ "SaveOption": { PropertyName: "DataExtensionObject", SaveAction: "UpdateAdd" } }]
         };
     
-        client.update('DataExtensionObject',co,uo, function(err, response){
+        SoapClient.update('DataExtensionObject',co,uo, function(err, response){
             
             if(err) { 
                 console.log('FuelSoap error: ',err);
