@@ -129,11 +129,11 @@ module.exports = function journeyLogger(app, options) {
      * 5xx - Contact is ejected from the Journey.
      */
     app.post('/modules/journey-logger/execute', async function(req, res) {
-        console.log('debug: /modules/journey-logger/execute');
+        /*console.log('debug: /modules/journey-logger/execute');*/
 
         const request = req.body;
 
-        console.log(" req.body", JSON.stringify(req.body));
+        /*console.log(" req.body", JSON.stringify(req.body));*/
 
         // Find the in argument
         function getInArgument(k) {
@@ -154,12 +154,12 @@ module.exports = function journeyLogger(app, options) {
         const journeyNameInArgument = getInArgument('journeyName');
         const labelInArgument = getInArgument('label');
 
-        console.log('contactkeyInArgument', contactkeyInArgument);
+        /*console.log('contactkeyInArgument', contactkeyInArgument);
         console.log('journeyDefinitionIdInArgument', journeyDefinitionIdInArgument);
         console.log('journeyVersionInArgument', journeyVersionInArgument);
         console.log('journeyIdInArgument', journeyIdInArgument);
         console.log('journeyNameInArgument', journeyNameInArgument);
-        console.log('labelInArgument', labelInArgument);
+        console.log('labelInArgument', labelInArgument);*/
 
         const dataExtensionEndpoint = 'https://'+sfmcApiSubdomain+'.rest.marketingcloudapis.com/data/v1/async/dataextensions/key:'+sfmcApiDataExtensionKey+'/rows';
         
@@ -167,6 +167,8 @@ module.exports = function journeyLogger(app, options) {
 
             if(isSfmcApiTokenExpired(sfmcApiToken)) {
                 await getSfmcApiToken();
+            } else {
+                console.log('Use existing token');
             }
 
             /*const decodedToken = jwt_decode(sfmcApiToken);
@@ -200,7 +202,7 @@ module.exports = function journeyLogger(app, options) {
                 data: dataExtensionResponse.data
             };
     
-            console.log('Response Object', JSON.stringify(responseObject));
+            /*console.log('Response Object', JSON.stringify(responseObject));*/
     
             return res.status(200).json(responseObject);
 
@@ -234,7 +236,7 @@ module.exports = function journeyLogger(app, options) {
             client_secret: sfmcApiClientSecret
         });
         sfmcApiToken = authResponse.data.access_token;
-        console.log('New token:', sfmcApiToken);
+        /*console.log('New token:', sfmcApiToken);*/
         return sfmcApiToken;
     }
 
