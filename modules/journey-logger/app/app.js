@@ -13,7 +13,6 @@
 
 const express = require('express');
 const axios = require('axios');
-const { default: jwt_decode } = require('jwt-decode');
 const configJSON = require('../config/config-json');
 
 // setup the journey-logger app
@@ -23,8 +22,8 @@ module.exports = function journeyLogger(app, options) {
     const sfmcApiClientSecret = process.env.clientSecret;
     const sfmcApiDataExtensionKey = 'Journey_Logger';
     const sfmcApiSubdomain = process.env.subdomain;
-    let sfmcApiToken = null;
-    let sfmcApiTokenExpDate = null;
+    let GLOBAL_sfmcApiToken = null;
+    let GLOBAL_sfmcApiTokenExpDate = null;
 
     // setup static resources
     app.use('/modules/journey-logger/dist', express.static(`${moduleDirectory}/dist`));
@@ -166,42 +165,13 @@ module.exports = function journeyLogger(app, options) {
         
         try {
 
-            if(isSfmcApiTokenExpired()) {
-                await getSfmcApiToken();
-            } else {
-                console.log('Use existing token');
-            }
-
-            /*const decodedToken = jwt_decode(sfmcApiToken);
-            console.log("decodedToken", JSON.stringify(decodedToken));*/
-            /*if(!sfmcApiToken) {
-                getSfmcApiToken();
-            }*/
-
-            const data = {
-                'items': [
-                    {
-                        'ContactKey': contactkeyInArgument,
-                        'Label': labelInArgument,
-                        'Journey Definition Id': journeyDefinitionIdInArgument,
-                        'Journey Version': journeyVersionInArgument,
-                        'Journey Name': journeyNameInArgument
-                    }
-                ],
-            };
-
-            const dataExtensionResponse = await axios.post(dataExtensionEndpoint, data, {
-                headers: {
-                    'Authorization': `Bearer ${sfmcApiToken}`,
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            // example: https://developer.salesforce.com/docs/atlas.en-us.noversion.mc-app-development.meta/mc-app-development/example-rest-activity.htm
-            const responseObject = {
+            const responseObject = await insertLogIntoDEREST({
+                contactkey: contactkeyInArgument,
                 label: labelInArgument,
-                data: dataExtensionResponse.data
-            };
+                journeyDefinitionId: journeyDefinitionIdInArgument,
+                journeyVersion: journeyVersionInArgument,
+                journeyName: journeyNameInArgument
+            });
     
             /*console.log('Response Object', JSON.stringify(responseObject));*/
     
@@ -214,28 +184,64 @@ module.exports = function journeyLogger(app, options) {
 
     });
 
+    async function insertLogIntoDEREST(logData) {
+
+        const dataExtensionEndpoint = 'https://'+sfmcApiSubdomain+'.rest.marketingcloudapis.com/data/v1/async/dataextensions/key:'+sfmcApiDataExtensionKey+'/rows';
+
+        if(isSfmcApiTokenExpired()) {
+            await getSfmcApiToken();
+        } else {
+            console.log(sfmcApiClientId + ' | Use existing token');
+        }
+
+        const data = {
+            'items': [
+                {
+                    'ContactKey': logData.contactkey,
+                    'Label': logData.label,
+                    'Journey Definition Id': logData.journeyDefinitionId,
+                    'Journey Version': logData.journeyVersion,
+                    'Journey Name': logData.journeyName
+                }
+            ],
+        };
+
+        const dataExtensionResponse = await axios.post(dataExtensionEndpoint, data, {
+            headers: {
+                'Authorization': `Bearer ${GLOBAL_sfmcApiToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        // example: https://developer.salesforce.com/docs/atlas.en-us.noversion.mc-app-development.meta/mc-app-development/example-rest-activity.htm
+        return {
+            label: logData.label,
+            data: dataExtensionResponse.data
+        };
+    }
+
 
     function isSfmcApiTokenExpired() {
-        if(!sfmcApiToken || sfmcApiToken == null || sfmcApiToken == '') {
+        if(!GLOBAL_sfmcApiToken || GLOBAL_sfmcApiToken == null || GLOBAL_sfmcApiToken == '') {
             return true;
         }
         const currentTime = Date.now() / 1000;
-        return sfmcApiTokenExpDate < currentTime;
+        return GLOBAL_sfmcApiTokenExpDate < currentTime;
     }
 
     async function getSfmcApiToken() {
-        console.log('Fetch New token');
+        console.log(sfmcApiClientId + ' | Fetch New token');
         const authEndpoint = 'https://'+sfmcApiSubdomain+'.auth.marketingcloudapis.com/v2/token';
         const authResponse = await axios.post(authEndpoint, {
             grant_type: 'client_credentials',
             client_id: sfmcApiClientId,
             client_secret: sfmcApiClientSecret
         });
-        sfmcApiToken = authResponse.data.access_token;
-        sfmcApiTokenExpDate = (Date.now() / 1000) + 180;
+        GLOBAL_sfmcApiToken = authResponse.data.access_token;
+        GLOBAL_sfmcApiTokenExpDate = (Date.now() / 1000) + 180;
         /*sfmcApiTokenExpDate = (Date.now() / 1000) + authResponse.data.expires_in;*/
         /*console.log('New token:', sfmcApiToken);*/
-        return sfmcApiToken;
+        return GLOBAL_sfmcApiToken;
     }
 
 };
