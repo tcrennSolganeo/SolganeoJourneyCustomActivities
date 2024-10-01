@@ -109,7 +109,7 @@ function onInitActivity(payload) {
     // a discountCode message from the drop down list. the discountCode back arg
     // will be set once the journey executes the activity
 
-    checkDataExtensionStatus();
+    //checkDataExtensionStatus();
 
 }
 
@@ -202,7 +202,7 @@ function setupEventHandlers() {
     // Listen to events on the form
     document.getElementById('done').addEventListener('click', onDoneButtonClick);
     document.getElementById('cancel').addEventListener('click', onCancelButtonClick);
-    document.getElementById('checkDE').addEventListener('click', onCheckDEClick);
+    //document.getElementById('checkDE').addEventListener('click', onCheckDEClick);
     document.getElementById('path-label').addEventListener('input', onLabelInputChange);
 }
 
