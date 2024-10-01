@@ -91,3 +91,7 @@ table th, table td {
     position: relative;
     top: calc(50% - 10px);
 }
+
+#path-label::placeholder {
+    color:#c2c2c2;
+}
